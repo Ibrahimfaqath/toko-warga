@@ -7,7 +7,7 @@ import postgres from 'postgres';
 import * as schema from './db/schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
-import { jwt } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 
 // 1. LOAD ENV
