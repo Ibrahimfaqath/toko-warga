@@ -53,6 +53,31 @@ const authMiddleware = async (c, next) => {
     }
 };
 
+// API Upload Produk (Admin Only)
+app.post('/api/products', authMiddleware, async (c) => {
+    try {
+        const body = await c.req.parseBody();
+        const imageFile = body['image']; // Ambil file dari form-data
+
+        // validasi
+        if (!imageFile || !(imageFile instanceof File)) {
+            return c.json({ success: false, message: 'Gambar wajib!'}, 400);
+        }
+
+        // 1. Upload ke Supabase Storage
+        const fileName = `prod_${Date.now()}_@{imageFile.name.replace(/\s/g, '_')}`;
+        const arrayBuffer = await imageFile.arrayBuffer(); // Ubah ke buffer
+
+        const { error: uploadError } = await supabase.storage
+          .from('products')
+          .upload(fileName, arrayBuffer, { contentType: imageFile.type });
+
+        if (uploadError) throw uploadError;
+
+        // 2. Ambil Public URL
+    }
+})
+
 // Code untuk menjalankan server
 const port = 2112;
 console.log(`Server running at http://localhost:${port}`);
