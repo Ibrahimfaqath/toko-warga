@@ -1,0 +1,55 @@
+// src/index.js
+import { serve } from '@hono/node-server';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from './db/schema.js';
+import { eq } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
+import { Jwt } from 'bcryptjs';
+import { createClient } from '@supabase/supabase-js';
+import { jwt } from 'hono/jwt';
+
+// 1. LOAD ENV
+process.loadEnvFile();
+
+// 2. Setup Koneksi 
+const client = postgres(process.env.DATABASE_URL);
+const db = drizzle(client, { schema });
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+const app = new Hono();
+app.use('/*', cors());
+
+// ,,, API LOGIN ,,,
+app.post('/api/login', async (c) => {
+    const { username, password } = await c.req.json();
+
+    // Cari user
+    const user = await db.query.users.findFirst({
+        where: eq(schema.users.username, username)
+    });
+
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+        return c.json({ success: false, message: 'Login Gagal' }, 401);
+    }
+
+    // Buat Token 
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return c.json({ success: true, token });
+});
+
+// Middleware Auth
+const authMiddleware = async (c, next) => {
+    const authHeader = c.req.header('Authorization');
+    if (!authHeader) return c.json({ message: 'Unauthorized' }, 401);
+    try {
+        const token = authHeader.split('')[1];
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        c.set('user', payload);
+        await next();
+    } catch (e) {
+        return c.json({ message: 'Invalid Token' }, 403);
+    }
+};

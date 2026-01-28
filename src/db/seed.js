@@ -1,5 +1,5 @@
 // src/db/seed.js
-import { drizzle } from 'drizzle-orm/postgres.js';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { users, categories } from './schema.js';
 import bcrypt from 'bcryptjs';
