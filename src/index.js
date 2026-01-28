@@ -53,3 +53,8 @@ const authMiddleware = async (c, next) => {
         return c.json({ message: 'Invalid Token' }, 403);
     }
 };
+
+// Code untuk menjalankan server
+const port = 2112;
+console.log(`Server running at http://localhost:${port}`);
+serve({ fetch: app.fetch, port});
