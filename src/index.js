@@ -7,7 +7,7 @@ import postgres from 'postgres';
 import * as schema from './db/schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
-import { Jwt } from 'bcryptjs';
+import { jwt } from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
 import { jwt } from 'hono/jwt';
 
