@@ -78,9 +78,21 @@ app.post('/api/products', authMiddleware, async (c) => {
         const ( data ) = supabase.storage.from('products').getPublicUrl(fileName);
         const imageUrl = data.PublicUrl;
 
-        
+        // 3. Simpan ke Database
+        await db.insert(schema.products).values({
+            name: body['name'],
+            description: body['description'],
+            price: body['price'],
+            stock: parseInt(body['stock']),
+            categoryId: parseInt(body['categoryId']),
+            imageUrl: imageurl
+        });
+
+        return c.json({ success: true, message: 'Produk Tersimpan', imageUrl})
+    } catch (e) {
+        return c.json({ success: false, message: e.message }, 500);
     }
-})
+});
 
 // Code untuk menjalankan server
 const port = 2112;
