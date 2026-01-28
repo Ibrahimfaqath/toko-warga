@@ -9,7 +9,6 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { jwt } from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
-import { jwt } from 'hono/jwt';
 
 // 1. LOAD ENV
 process.loadEnvFile();
