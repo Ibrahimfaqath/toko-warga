@@ -76,7 +76,7 @@ app.post('/api/products', authMiddleware, async (c) => {
 
         // 2. Ambil Public URL
         const { data } = supabase.storage.from('products').getPublicUrl(fileName);
-        const imageUrl = data.PublicUrl;
+        const imageUrl = data.publicUrl;
 
         // 3. Simpan ke Database
         await db.insert(schema.products).values({
