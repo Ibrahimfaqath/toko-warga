@@ -102,6 +102,23 @@ app.get('/api/products', async (c) => {
     return c.json({ success: true, data });
 });
 
+// API Checkout (Public)
+app.post('/api/orders', async (c) => {
+    const { customerName, address, items } = await c.req.json();
+    // items: [{ productId: 1, quantity: 2 }]
+
+    try {
+        const result = await db.transaction(async (tx) => {
+            let total = 0;
+
+            // 1. Buat Order Header
+            const [newOrder] = await tx.insert(schema.orders).values({
+                customerName, address, totalAmount: "0", status: 'pending'
+            }).returning();
+        })
+    }
+})
+
 // Code untuk menjalankan server
 const port = 2112;
 console.log(`Server running at http://localhost:${port}`);
