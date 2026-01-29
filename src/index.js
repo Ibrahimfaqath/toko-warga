@@ -44,7 +44,7 @@ const authMiddleware = async (c, next) => {
     const authHeader = c.req.header('Authorization');
     if (!authHeader) return c.json({ message: 'Unauthorized' }, 401);
     try {
-        const token = authHeader.split('')[1];
+        const token = authHeader.split(' ')[1];
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         c.set('user', payload);
         await next();
