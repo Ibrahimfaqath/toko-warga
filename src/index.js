@@ -75,7 +75,7 @@ app.post('/api/products', authMiddleware, async (c) => {
         if (uploadError) throw uploadError;
 
         // 2. Ambil Public URL
-        const ( data ) = supabase.storage.from('products').getPublicUrl(fileName);
+        const { data } = supabase.storage.from('products').getPublicUrl(fileName);
         const imageUrl = data.PublicUrl;
 
         // 3. Simpan ke Database
