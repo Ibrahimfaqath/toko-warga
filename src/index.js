@@ -9,6 +9,7 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
+import { desc } from 'drizzle-orm'; 
 
 // 1. LOAD ENV
 process.loadEnvFile();
@@ -92,6 +93,13 @@ app.post('/api/products', authMiddleware, async (c) => {
     } catch (e) {
         return c.json({ success: false, message: e.message }, 500);
     }
+});
+
+// API List Product (Public)
+
+app.get('/api/products', async (c) => {
+    const data = await db.select().from(schema.products).orderBy(desc(schema.products.id));
+    return c.json({ success: true, data });
 });
 
 // Code untuk menjalankan server
