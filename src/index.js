@@ -85,7 +85,7 @@ app.post('/api/products', authMiddleware, async (c) => {
             price: body['price'],
             stock: parseInt(body['stock']),
             categoryId: parseInt(body['categoryId']),
-            imageUrl: imageurl
+            imageUrl: imageUrl
         });
 
         return c.json({ success: true, message: 'Produk Tersimpan', imageUrl})
