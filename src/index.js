@@ -65,7 +65,7 @@ app.post('/api/products', authMiddleware, async (c) => {
         }
 
         // 1. Upload ke Supabase Storage
-        const fileName = `prod_${Date.now()}_@{imageFile.name.replace(/\s/g, '_')}`;
+        const fileName = `prod_${Date.now()}_${imageFile.name.replace(/\s/g, '_')}`;
         const arrayBuffer = await imageFile.arrayBuffer(); // Ubah ke buffer
 
         const { error: uploadError } = await supabase.storage
