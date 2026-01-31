@@ -18,6 +18,28 @@
 
         <button type="submit">Masuk</button>
     </form>
-    
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: document.getElementById(username).valuue,
+                    password: document.getElementById('password').value
+                })
+            });
+            const data = await res.json();
+            
+            if(data.success) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '/admin.html';
+            } else {
+                alert(data.message);
+            }
+        })
+    </script>
 </body>
 </html>
