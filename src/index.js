@@ -115,9 +115,40 @@ app.post('/api/orders', async (c) => {
             const [newOrder] = await tx.insert(schema.orders).values({
                 customerName, address, totalAmount: "0", status: 'pending'
             }).returning();
+
+            // 2. Proses Items
+            for (const item of items) {
+                // Cek Stok
+                const product = await tx.query.products.findFirst({
+                    where: eq(schema.products.id, item.productId)
+                });
+
+                if (!product || product.stock < item.quantity) {
+                    throw new Error(`Stok ${product?.name} kurang!`);
+                }
+
+                total += (parseFloat(product.price) * item.quantity);
+
+                // Catat Item & Kurangi Stok
+                await tx.insert(schema.orderItems).values({
+                    orderId: newOrder.id,
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    priceAtTime: product.price
+                });
+
+                await tx.update(schema.products)
+                  .set({ stock: product.stock - item.quantity })
+                  .where(eq(schema.product.id, item.productId));
+
+                  return { orderId: newOrder.id, total };
+
+            }
         })
+    } catch (e) {
+        return c.json({ success: false, message: e.message }, 400);
     }
-})
+});
 
 // Code untuk menjalankan server
 const port = 2112;
