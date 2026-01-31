@@ -9,7 +9,7 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import { desc } from 'drizzle-orm'; 
+import { desc } from 'drizzle-orm';
 
 // 1. LOAD ENV
 process.loadEnvFile();
@@ -62,7 +62,7 @@ app.post('/api/products', authMiddleware, async (c) => {
 
         // validasi
         if (!imageFile || !(imageFile instanceof File)) {
-            return c.json({ success: false, message: 'Gambar wajib!'}, 400);
+            return c.json({ success: false, message: 'Gambar wajib!' }, 400);
         }
 
         // 1. Upload ke Supabase Storage
@@ -70,8 +70,8 @@ app.post('/api/products', authMiddleware, async (c) => {
         const arrayBuffer = await imageFile.arrayBuffer(); // Ubah ke buffer
 
         const { error: uploadError } = await supabase.storage
-          .from('products')
-          .upload(fileName, arrayBuffer, { contentType: imageFile.type });
+            .from('products')
+            .upload(fileName, arrayBuffer, { contentType: imageFile.type });
 
         if (uploadError) throw uploadError;
 
@@ -89,7 +89,7 @@ app.post('/api/products', authMiddleware, async (c) => {
             imageUrl: imageUrl
         });
 
-        return c.json({ success: true, message: 'Produk Tersimpan', imageUrl})
+        return c.json({ success: true, message: 'Produk Tersimpan', imageUrl })
     } catch (e) {
         return c.json({ success: false, message: e.message }, 500);
     }
@@ -138,13 +138,20 @@ app.post('/api/orders', async (c) => {
                 });
 
                 await tx.update(schema.products)
-                  .set({ stock: product.stock - item.quantity })
-                  .where(eq(schema.product.id, item.productId));
-
-                  return { orderId: newOrder.id, total };
-
+                    .set({ stock: product.stock - item.quantity })
+                    .where(eq(schema.products.id, item.productId));
             }
+
+            // Update Total Harga
+            await tx.update(schema.orders)
+                .set({ totalAmount: total.toString() })
+                .where(eq(schema.orders.id, newOrder.id));
+
+            return { orderId: newOrder.id, total };
         })
+
+        return c.json({ success: true, ...result });
+
     } catch (e) {
         return c.json({ success: false, message: e.message }, 400);
     }
@@ -153,4 +160,4 @@ app.post('/api/orders', async (c) => {
 // Code untuk menjalankan server
 const port = 2112;
 console.log(`Server running at http://localhost:${port}`);
-serve({ fetch: app.fetch, port});
+serve({ fetch: app.fetch, port });
