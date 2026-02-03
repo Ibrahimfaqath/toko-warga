@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Warga</title>
+</head>
+
+<body>
+    <h1>Toko Warga</h1>
+    <button onclick="toggleCart()">
+        Lihat Keranjang (<span id="count">0</span>)
+    </button>
+    <hr>
+
+    <div id="cartModal"
+        style="display: none; background-color: #eee; padding: 20px; border: 1px solid black; margin-bottom: 20px;">
+        <h2>keranjang Anda</h2>
+        <div id="cartList"></div>
+        <br>
+
+        <label>Nama Pemesan:</label><br>
+        <input type="text" id="cName"><br>
+
+        <label>Alamat Pengiriman:</label><br>
+        <input type="text" id="cAddr"><br>
+
+        <button onclick="checkout()">Beli via WhatsApp</button>
+        <button onclick="toggleCart()">Tutup</button>
+    </div>
+
+    <div id="products"></div>
+
+    <script>
+        let cart = [];
+        let allProducts = [];
+
+        async function load() {
+            const res = await fetch('/api/products');
+            const json = await res.json();
+            allProducts = json.data;
+
+            // Render tanpa class css
+            document.getElementById('products').innerHTML = allProducts.map(p => `
+              <div style="border: 1px solid #ccc; padding: 10px; margin-button: 10px;")
+              <img src="${p.imageUrl}" width="150" alt="${p.name}"><br>
+              <h3>${p.name}</h3>
+              <p>Harga: Rp ${parseInt(p.price).toLocaleString()}</p>
+              <button onclick="add(${p.id})"Tambah (+)</button>
+              </div>
+        `).join('')
+        } 
+
+        function add(id) {
+            const exist = cart.find(c => c.productId === id);
+            if(exist) exist.quantity++;
+            else cart.push({ productId: id, quantity: 1 });
+            updateCount();
+        }
+
+        function toggleCart() {
+            const m = document.getElementById('cartModal');
+            // Logika toggle sederhana
+            if (m.style.display === 'none') {
+                m.style.display = 'block';
+                renderCartList();
+            } else {
+                m.style.display = 'none';
+            }
+        }
+
+        function renderCartList() {
+            document.getElementById('cartList').innerHTML = cart.map(c => {
+                const p = allProducts.find(x => x.id === c.productId);
+                return `
+                  <div>
+                    ${p.name} (x${c.quantity}) - Rp${(p.price*c.quantity).toLocaleString()}
+                  </div>`;  
+            }).join('');
+        }
+    </script>
+
+
+</body>
+
+</html>
