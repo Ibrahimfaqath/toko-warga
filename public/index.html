@@ -50,11 +50,11 @@
               <button onclick="add(${p.id})"Tambah (+)</button>
               </div>
         `).join('')
-        } 
+        }
 
         function add(id) {
             const exist = cart.find(c => c.productId === id);
-            if(exist) exist.quantity++;
+            if (exist) exist.quantity++;
             else cart.push({ productId: id, quantity: 1 });
             updateCount();
         }
@@ -75,13 +75,31 @@
                 const p = allProducts.find(x => x.id === c.productId);
                 return `
                   <div>
-                    ${p.name} (x${c.quantity}) - Rp${(p.price*c.quantity).toLocaleString()}
-                  </div>`;  
+                    ${p.name} (x${c.quantity}) - Rp${(p.price * c.quantity).toLocaleString()}
+                  </div>`;
             }).join('');
         }
+
+        async function checkout() {
+            const name = document.getElementById('cName').value;
+            const addr = document.getElementById('cAddr').value;
+            if (name || !addr || cart.length === 0) return alert('Data belum lengkap / Keranjang kosong');
+
+            const res = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customerName: name, address: addr, items: cart })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                const msg = `Halo Admin, Order ID #${data.orderId}. Total: Rp $${data.total.toLocaleString()}. Dikirim ke: ${addr}`;
+                // Redirect ke WA
+                window.location.href = `https://wa.me/6285752214806?text=${encodeURIComponent(msg)}`;
+            }
+        }
+
+        load()
     </script>
-
-
 </body>
-
 </html>
