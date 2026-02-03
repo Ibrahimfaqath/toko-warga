@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Halaman Admin</h1>
+    <p>Tambah Produk Baru</p>
+    <hr>
+
+    <form id="productForm">
+        <label>Nama Produk:</label><br>
+        <input type="text" name="name" required><br>
+
+        <label>Deskripsi:</label><br>
+        <textarea id="desc"></textarea><br>
+
+        <label>Harga (Rp):</label><br>
+        <input type="number" id="price" required><br>
+
+        <label>Stok:</label><br>
+        <input type="number" id="stock" required><br>
+
+        <label>Kategori:</label><br>
+        <select id="category">
+            <option value="1">Makanan</option>
+            <option value="2">Minuman</option>
+            <option value="3">Pakaian</option>           
+        </select><br>
+
+        <label>Gambar:</label><br>
+        <input type="file" id="image" required><br>
+
+        <button type="submit">Simpan Produk</button>
+    </form>
+
+    <br>
+    <a href="/index.html">ke Halaman Belanja >></a>
+    
+</body>
+</html>
