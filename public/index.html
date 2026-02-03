@@ -40,11 +40,14 @@
             const res = await fetch('/api/products');
             const json = await res.json();
             allProducts = json.data;
+          
+            
 
             // Render tanpa class css
             document.getElementById('products').innerHTML = allProducts.map(p => `
-              <div style="border: 1px solid #ccc; padding: 10px; margin-button: 10px;")
-              <img src="${p.imageUrl}" width="150" alt="${p.name}"><br>
+              <div style="border: 1px solid #ccc; padding: 10px; margin-button: 10px; background-color: yellow;")
+              console.log('tesing p: ', p)
+              <img src="${p.imageUrl}" width="150" alt="${p.name}" style="background-color: pink;"><br>
               <h3>${p.name}</h3>
               <p>Harga: Rp ${parseInt(p.price).toLocaleString()}</p>
               <button onclick="add(${p.id})"Tambah (+)</button>
@@ -57,6 +60,10 @@
             if (exist) exist.quantity++;
             else cart.push({ productId: id, quantity: 1 });
             updateCount();
+        }
+
+        function updateCount() {
+            document.getElementById('count').innerText = cart.reduce((a, b)=>a+b.quantity,0)
         }
 
         function toggleCart() {
