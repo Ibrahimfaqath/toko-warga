@@ -41,16 +41,14 @@
             const json = await res.json();
             allProducts = json.data;
           
-            
-
             // Render tanpa class css
             document.getElementById('products').innerHTML = allProducts.map(p => `
-              <div style="border: 1px solid #ccc; padding: 10px; margin-button: 10px; background-color: yellow;")
+              <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background-color: yellow;">
               console.log('tesing p: ', p)
               <img src="${p.imageUrl}" width="150" alt="${p.name}" style="background-color: pink;"><br>
               <h3>${p.name}</h3>
               <p>Harga: Rp ${parseInt(p.price).toLocaleString()}</p>
-              <button onclick="add(${p.id})"Tambah (+)</button>
+              <button onclick="add(${p.id})">Tambah (+)</button>
               </div>
         `).join('')
         }
