@@ -122,6 +122,8 @@
                 const json = await res.json();
                 allProducts = json.data;
 
+                renderProducts(allProducts);
+
                 const productsContainer = document.getElementById('products');
                 if (allProducts.length === 0) {
                     productsContainer.innerHTML = `<p class="col-span-full text-center py-20 text-slate-400">Belum ada produk yang tersedia.</p>`;
