@@ -330,6 +330,41 @@
         </div>
     `).join('');
         }
+
+        let currentCategory = 'all';
+
+        function filterCategory(catId) {
+            currentCategory = catId;
+
+            // Update tampilan tombol yang aktif
+            const btns = document.querySelectorAll('.category-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-white', 'text-slate-600');
+            });
+
+            event.currentTarget.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+            event.currentTarget.classList.remove('bg-white', 'text-slate-600');
+
+            applyFilters();
+        }
+
+        function searchProducts() {
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = allProducts.filter(p => {
+                const matchSearch = p.name.toLowerCase().includes(query) || (p.description && p.description.toLowerCase().includes(query));
+                const matchCategory = currentCategory === 'all' || p.categoryId.toString() === currentCategory;
+
+                return matchSearch && matchCategory;
+            });
+
+            renderProducts(filtered);
+        }
     </script>
 </body>
 
