@@ -45,7 +45,7 @@
 
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData();
+            const formData = new formData();
             formData.append('name', document.getElementById('name').value);
             formData.append('description', document.getElementById('description').value);
             formData.append('price', document.getElementById('price').value);
