@@ -40,7 +40,7 @@
             const res = await fetch('/api/products');
             const json = await res.json();
             allProducts = json.data;
-          
+
             // Render tanpa class css
             document.getElementById('products').innerHTML = allProducts.map(p => `
               <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
@@ -49,7 +49,7 @@
               <p>Harga: Rp ${parseInt(p.price).toLocaleString()}</p>
               <button onclick="add(${p.id})">Tambah (+)</button>
               </div>
-        `).join('')
+        `).join('');
         }
 
         function add(id) {
@@ -60,7 +60,7 @@
         }
 
         function updateCount() {
-            document.getElementById('count').innerText = cart.reduce((a, b)=>a+b.quantity,0)
+            document.getElementById('count').innerText = cart.reduce((a, b) => a + b.quantity, 0);
         }
 
         function toggleCart() {
@@ -87,7 +87,7 @@
         async function checkout() {
             const name = document.getElementById('cName').value;
             const addr = document.getElementById('cAddr').value;
-            if (name || !addr || cart.length === 0) return alert('Data belum lengkap / Keranjang kosong');
+            if (!name || !addr || cart.length === 0) return alert('Data belum lengkap / Keranjang kosong');
 
             const res = await fetch('/api/orders', {
                 method: 'POST',
@@ -97,7 +97,7 @@
             const data = await res.json();
 
             if (data.success) {
-                const msg = `Halo Admin, Order ID #${data.orderId}. Total: Rp $${data.total.toLocaleString()}. Dikirim ke: ${addr}`;
+                const msg = `Halo Admin, Order ID #${data.orderId}. Total: Rp ${data.total.toLocaleString()}. Dikirim ke: ${addr}`;
                 // Redirect ke WA
                 window.location.href = `https://wa.me/6285752214806?text=${encodeURIComponent(msg)}`;
             }
@@ -106,4 +106,5 @@
         load()
     </script>
 </body>
+
 </html>
