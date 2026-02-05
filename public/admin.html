@@ -256,19 +256,32 @@
 
     // Hapus Produk
     async function deleteProduct(id) {
-        if (!confirm('Hapus produk ini secara permanen?')) return;
+    if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
+
+    try {
         const res = await fetch(`/api/products/${id}`, {
             method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + token }
+            headers: { 
+                'Authorization': 'Bearer ' + token 
+            }
         });
+        
         const data = await res.json();
+        
         if (data.success) {
-            alert('Terhapus!');
-            fetchAdminProducts();
+            alert('Produk berhasil dihapus!');
+            fetchAdminProducts(); // Memuat ulang daftar produk tanpa refresh halaman
+        } else {
+            alert('Gagal menghapus: ' + data.message);
         }
+    } catch (e) {
+        alert('Terjadi kesalahan koneksi ke server.');
     }
+}
 
     fetchAdminProducts();
+
+
 </script>
 </body>
 
