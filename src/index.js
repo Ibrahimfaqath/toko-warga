@@ -159,6 +159,60 @@ app.post('/api/orders', async (c) => {
     }
 });
 
+// 1. API DELETE PRODUK
+app.delete('/api/products/:id', authMiddleware, async (c) => {
+    const id = c.req.param('id');
+    try {
+        // Ambil data produk untuk mendapatkan URL gambar
+        const product = await db.query.products.findFirst({
+            where: eq(schema.products.id, parseInt(id))
+        });
+
+        if (!product) return c.json({ success: false, message: 'Produk tidak ditemukan' }, 404);
+
+        // Hapus file dari Supabase Storage (opsional tapi disarankan)
+        const fileName = product.imageUrl.split('/').pop();
+        await supabase.storage.from('products').remove([fileName]);
+
+        // Hapus dari Database
+        await db.delete(schema.products).where(eq(schema.products.id, parseInt(id)));
+
+        return c.json({ success: true, message: 'Produk berhasil dihapus' });
+    } catch (e) {
+        return c.json({ success: false, message: e.message }, 500);
+    }
+});
+
+// 2. API UPDATE PRODUK
+app.put('/api/products/:id', authMiddleware, async (c) => {
+    const id = c.req.param('id');
+    try {
+        const body = await c.req.parseBody();
+        const updateData = {
+            name: body['name'],
+            description: body['description'],
+            price: body['price'],
+            stock: parseInt(body['stock']),
+            categoryId: parseInt(body['categoryId']),
+        };
+
+        const imageFile = body['image'];
+        if (imageFile && imageFile instanceof File) {
+            // Logika upload gambar baru jika ada
+            const fileName = `prod_${Date.now()}_${imageFile.name.replace(/\s/g, '_')}`;
+            const arrayBuffer = await imageFile.arrayBuffer();
+            await supabase.storage.from('products').upload(fileName, arrayBuffer, { contentType: imageFile.type });
+            const { data } = supabase.storage.from('products').getPublicUrl(fileName);
+            updateData.imageUrl = data.publicUrl;
+        }
+
+        await db.update(schema.products).set(updateData).where(eq(schema.products.id, parseInt(id)));
+        return c.json({ success: true, message: 'Produk berhasil diupdate' });
+    } catch (e) {
+        return c.json({ success: false, message: e.message }, 500);
+    }
+});
+
 // Code untuk menjalankan server
 const port = 2112;
 console.log(`Server running at http://localhost:${port}`);
