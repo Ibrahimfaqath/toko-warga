@@ -213,6 +213,30 @@ app.put('/api/products/:id', authMiddleware, async (c) => {
     }
 });
 
+// API DELETE PRODUK
+app.delete('/api/products/:id', authMiddleware, async (c) => {
+    const id = c.req.param('id');
+    try {
+        // 1. Cari data produk untuk mendapatkan URL gambarnya
+        const product = await db.query.products.findFirst({
+            where: eq(schema.products.id, parseInt(id))
+        });
+
+        if (!product) return c.json({ success: false, message: 'Produk tidak ditemukan' }, 404);
+
+        // 2. Hapus file gambar di Supabase Storage agar tidak penuh
+        const fileName = product.imageUrl.split('/').pop();
+        await supabase.storage.from('products').remove([fileName]);
+
+        // 3. Hapus data dari Database
+        await db.delete(schema.products).where(eq(schema.products.id, parseInt(id)));
+
+        return c.json({ success: true, message: 'Produk berhasil dihapus' });
+    } catch (e) {
+        return c.json({ success: false, message: e.message }, 500);
+    }
+});
+
 // Code untuk menjalankan server
 const port = 2112;
 console.log(`Server running at http://localhost:${port}`);
