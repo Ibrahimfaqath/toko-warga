@@ -47,6 +47,60 @@ app.get('/api/products', async (c) => {
     return c.json({ success: true, data });
 });
 
+// --- FITUR BARU: SIMPAN PESANAN (FIX 404 ERROR) ---
+app.post('/api/orders', async (c) => {
+    try {
+        const { customerName, address, items } = await c.req.json();
+        
+        const result = await db.transaction(async (tx) => {
+            // 1. Buat pesanan baru
+            const [newOrder] = await tx.insert(schema.orders).values({
+                customerName,
+                address,
+                totalAmount: "0",
+                status: 'pending'
+            }).returning();
+
+            let total = 0;
+
+            // 2. Simpan item pesanan & update stok
+            for (const item of items) {
+                const product = await tx.query.products.findFirst({ 
+                    where: eq(schema.products.id, item.productId) 
+                });
+
+                if (!product || product.stock < item.quantity) {
+                    throw new Error(`Stok ${product?.name} tidak cukup!`);
+                }
+
+                total += (parseFloat(product.price) * item.quantity);
+
+                await tx.insert(schema.orderItems).values({
+                    orderId: newOrder.id,
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    priceAtTime: product.price
+                });
+
+                await tx.update(schema.products)
+                    .set({ stock: product.stock - item.quantity })
+                    .where(eq(schema.products.id, item.productId));
+            }
+
+            // 3. Update total harga
+            await tx.update(schema.orders)
+                .set({ totalAmount: total.toString() })
+                .where(eq(schema.orders.id, newOrder.id));
+
+            return newOrder.id;
+        });
+
+        return c.json({ success: true, orderId: result });
+    } catch (e) {
+        return c.json({ success: false, message: e.message }, 400);
+    }
+});
+
 // CREATE PRODUK
 app.post('/api/products', authMiddleware, async (c) => {
     try {
@@ -71,7 +125,7 @@ app.post('/api/products', authMiddleware, async (c) => {
     } catch (e) { return c.json({ success: false, message: e.message }, 500); }
 });
 
-// UPDATE PRODUK (LOGIKA FINAL)
+// UPDATE PRODUK
 app.put('/api/products/:id', authMiddleware, async (c) => {
     const id = parseInt(c.req.param('id'));
     try {
@@ -85,22 +139,14 @@ app.put('/api/products/:id', authMiddleware, async (c) => {
         };
 
         const imageFile = body['image'];
-        
-        // Cek apakah ada file baru (bukan string nama file lama)
         if (imageFile && imageFile instanceof File && imageFile.size > 0) {
             const fileName = `upd_${Date.now()}_${imageFile.name.replace(/\s/g, '_')}`;
             const arrayBuffer = await imageFile.arrayBuffer();
-            
-            const { error: uploadError } = await supabase.storage
-                .from('products')
-                .upload(fileName, arrayBuffer, { contentType: imageFile.type });
-
+            const { error: uploadError } = await supabase.storage.from('products').upload(fileName, arrayBuffer, { contentType: imageFile.type });
             if (uploadError) throw uploadError;
-
             const { data } = supabase.storage.from('products').getPublicUrl(fileName);
             updateData.imageUrl = data.publicUrl;
         }
-
         await db.update(schema.products).set(updateData).where(eq(schema.products.id, id));
         return c.json({ success: true });
     } catch (e) { return c.json({ success: false, message: e.message }, 500); }
