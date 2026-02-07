@@ -1,409 +1,191 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toko Warga - Belanja Mudah</title>
+    <title>PesanAja - Coffee & Resto</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .product-card:hover img {
-            transform: scale(1.05);
-        }
-
-        :root {
-            /* Palet Warna Warm Chocolate */
-            --primary: #6F4E37;
-            /* Coffee Brown */
-            --primary-hover: #5D4037;
-            /* Darker Brown */
-            --bg-cream: #FDF8F5;
-            /* Soft Cream Background */
-            --accent-cream: #F5EBE0;
-            /* Deeper Cream for UI Elements */
-            --text-main: #3E2723;
-            /* Dark Chocolate for Text */
-        }
-
-        body {
-            background-color: var(--bg-cream);
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        /* Mengganti class Tailwind Indigo ke Brown secara manual via CSS */
-        .bg-indigo-600 {
-            background-color: var(--primary) !important;
-        }
-
-        .hover\:bg-indigo-700:hover {
-            background-color: var(--primary-hover) !important;
-        }
-
-        .text-indigo-600 {
-            color: var(--primary) !important;
-        }
-
-        .shadow-indigo-200 {
-            --tw-shadow-color: rgba(111, 78, 55, 0.2) !important;
-        }
-
-        .focus\:ring-indigo-500:focus {
-            --tw-ring-color: var(--primary) !important;
-        }
+        body { background-color: #FDF8F5; color: #3E2723; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .product-card:hover img { transform: scale(1.05); }
     </style>
 </head>
-
-<body class="bg-slate-50 text-slate-900 leading-relaxed">
-    <nav class="bg-white/70 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-[#E3D5CA]">
-        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row gap-4 items-center">
-
-            <div class="flex items-center justify-between w-full md:w-auto gap-3">
-                <div class="flex items-center gap-2">
-                    <div
-                        class="w-10 h-10 bg-[#6F4E37] rounded-xl flex items-center justify-center text-[#F5EBE0] shadow-lg shadow-stone-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
-                    <h1 class="text-xl font-extrabold tracking-tight text-[#3E2723]">
-                        Pesan<span class="text-[#8D6E63]">Aja</span>
-                    </h1>
-                </div>
-
-                <button onclick="toggleCart()"
-                    class="md:hidden relative bg-[#F5EBE0] p-2.5 rounded-full text-[#6F4E37]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                    <span id="count-mobile"
-                        class="absolute -top-1 -right-1 bg-[#6F4E37] text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">0</span>
-                </button>
-            </div>
-
-            <div class="relative w-full md:max-w-md md:mx-auto group">
-                <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Cari menu favoritmu..."
-                    class="w-full px-5 py-2.5 rounded-2xl border border-[#D5BDAF] outline-none focus:ring-2 focus:ring-[#6F4E37] transition-all bg-white/50 pr-10 text-sm italic">
-                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8D6E63]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-            </div>
-
-            <div class="hidden md:block">
-                <button onclick="toggleCart()"
-                    class="relative bg-[#F5EBE0] hover:bg-[#E3D5CA] p-2.5 rounded-xl transition-all flex items-center gap-2 group">
-                    <span class="text-sm font-bold text-[#6F4E37]">Keranjang</span>
-                    <span id="count"
-                        class="bg-[#6F4E37] text-white text-[10px] font-bold px-2 py-0.5 rounded-lg">0</span>
-                </button>
-            </div>
+<body class="pb-20">
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-orange-100 shadow-sm px-4 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-[#6F4E37] rounded-lg flex items-center justify-center text-white font-bold">P</div>
+            <h1 class="text-xl font-extrabold text-[#3E2723]">Pesan<span class="text-[#6F4E37]">Aja</span></h1>
         </div>
+        <button onclick="toggleCart()" class="relative p-2 bg-orange-50 rounded-2xl transition-all active:scale-90">
+            <span class="text-xl">🛒</span>
+            <span id="cartCount" class="absolute -top-1 -right-1 bg-[#6F4E37] text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white">0</span>
+        </button>
     </nav>
 
-    <section class="container mx-auto px-4 py-8">
-        <div class="relative overflow-hidden rounded-[2.5rem] bg-[#6F4E37] text-[#FDF8F5] shadow-2xl shadow-stone-300">
-            <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#8D6E63] opacity-20 rounded-full"></div>
-            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-[#F5EBE0] opacity-10 rounded-full"></div>
+    <main class="max-w-7xl mx-auto px-4 pt-8">
+        <div class="mb-8">
+            <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Cari menu favoritmu..." class="w-full p-4 rounded-3xl border-none shadow-sm focus:ring-2 focus:ring-[#6F4E37] outline-none bg-white">
+        </div>
 
-            <div class="relative grid md:grid-cols-2 gap-8 items-center p-8 md:p-12">
-                <div class="space-y-6">
-                    <span
-                        class="inline-block px-4 py-1.5 bg-[#8D6E63] text-[#FDF8F5] rounded-full text-xs font-bold tracking-widest uppercase">
-                        ☕ Teman Santai Terbaik
-                    </span>
-                    <h2 class="text-4xl md:text-5xl font-extrabold leading-tight">
-                        Rasa Premium, <br>
-                        <span class="text-[#D5BDAF]">PesanAja</span> dari Rumah.
-                    </h2>
-                    <p class="text-[#F5EBE0] text-sm md:text-base max-w-sm leading-relaxed opacity-90">
-                        Nikmati pilihan makanan & minuman terbaik yang dibuat khusus untuk menemani harimu.
-                    </p>
-                    <div class="flex gap-4">
-                        <a href="#products"
-                            class="bg-[#FDF8F5] text-[#6F4E37] px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#F5EBE0] transition-all">
-                            Lihat Menu
-                        </a>
-                    </div>
-                </div>
-
-                <div class="hidden md:block relative group">
-                    <img src="assets/copy.jpg" alt="Hero Image"
-                        class="rounded-3xl shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500 object-cover h-72 w-full border-4 border-white/20">
-
-                    <div
-                        class="absolute -bottom-4 -right-4 bg-white p-4 rounded-2xl shadow-xl hidden lg:block animate-bounce">
-                        <p class="text-[#6F4E37] font-bold text-xs text-center">☕ Best Seller!</p>
-                    </div>
-                </div>
+        <div id="productList" class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             </div>
-        </div>
-    </section>
-
-    <div class="container mx-auto px-4 pt-6">
-        <div class="flex flex-col gap-6">
-
-
-
-            <div class="flex gap-2 overflow-x-auto pb-2 justify-center no-scrollbar">
-                <button onclick="filterCategory('all')"
-                    class="category-btn active bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-md transition-all">Semua</button>
-                <button onclick="filterCategory('1')"
-                    class="category-btn bg-white text-slate-600 border border-slate-200 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-50 transition-all text-nowrap">🍕
-                    Makanan</button>
-                <button onclick="filterCategory('2')"
-                    class="category-btn bg-white text-slate-600 border border-slate-200 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-50 transition-all text-nowrap">🥤
-                    Minuman</button>
-                <button onclick="filterCategory('3')"
-                    class="category-btn bg-white text-slate-600 border border-slate-200 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-50 transition-all text-nowrap">🍿
-                    Cemilan</button>
-            </div>
-        </div>
-    </div>
-
-    <main class="container mx-auto px-4 py-12">
-        <div id="products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <div class="animate-pulse bg-white p-4 rounded-2xl shadow-sm border border-slate-100 h-80"></div>
-            <div class="animate-pulse bg-white p-4 rounded-2xl shadow-sm border border-slate-100 h-80"></div>
-            <div class="animate-pulse bg-white p-4 rounded-2xl shadow-sm border border-slate-100 h-80"></div>
-            <div class="animate-pulse bg-white p-4 rounded-2xl shadow-sm border border-slate-100 h-80"></div>
-        </div>
     </main>
 
-    <div id="cartModal" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="toggleCart()"></div>
-
-        <div
-            class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl flex flex-col transform transition-transform duration-300">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <span class="text-2xl">📦</span> Keranjang Belanja
-                </h2>
-                <button onclick="toggleCart()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+    <div id="cartModal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleCart()"></div>
+        <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Pesanan Kamu</h2>
+                <button onclick="toggleCart()" class="text-slate-400">✕</button>
             </div>
+            
+            <div id="cartItems" class="flex-grow overflow-y-auto space-y-4 mb-6"></div>
 
-            <div class="flex-grow overflow-y-auto p-6 space-y-4" id="cartList">
-                <p class="text-center text-slate-400 italic py-10">Keranjang masih kosong...</p>
-            </div>
-
-            <div class="p-6 bg-slate-50 border-t border-slate-100 space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Nama Pemesan</label>
-                    <input type="text" id="cName" placeholder="Contoh: Budi Santoso"
-                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm">
+            <div class="border-t pt-6 space-y-4">
+                <input type="text" id="custName" placeholder="Nama Kamu" class="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none">
+                <textarea id="custAddress" placeholder="Nomor Meja / Alamat" class="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none"></textarea>
+                
+                <div class="flex justify-between items-center text-xl font-bold py-2">
+                    <span>Total</span>
+                    <span id="cartTotal" class="text-[#6F4E37]">Rp0</span>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Alamat Lengkap</label>
-                    <textarea id="cAddr" placeholder="Jln. Melati No. 123..."
-                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm h-20"></textarea>
-                </div>
-                <div class="pt-4 border-t border-slate-200">
-                    <button onclick="checkout()"
-                        class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-green-100 flex justify-center items-center gap-2 active:scale-95">
-                        <span>Pesan Lewat WhatsApp</span>
-                    </button>
-                </div>
+                
+                <button onclick="checkout()" class="w-full bg-[#6F4E37] hover:bg-[#3E2723] text-white py-4 rounded-2xl font-bold shadow-lg transition-all active:scale-95">
+                    Konfirmasi via WhatsApp
+                </button>
             </div>
         </div>
     </div>
 
-    <footer class="bg-white border-t border-slate-100 py-10">
-        <div class="container mx-auto px-4 text-center text-slate-400 text-sm">
-            <p>&copy; 2026 Toko Warga. All rights reserved.</p>
-        </div>
-    </footer>
-
     <script>
-    let cart = [];
-    let allProducts = [];
-    let currentCategory = 'all';
+        let allProducts = [];
+        let cart = [];
+        const WA_NUMBER = "6285752214806"; // Nomor WhatsApp Ibrahim
 
-    // 1. LOAD PRODUK DARI API
-    async function load() {
-        try {
+        async function load() {
             const res = await fetch('/api/products');
             const json = await res.json();
             allProducts = json.data;
             renderProducts(allProducts);
-        } catch (error) {
-            console.error("Gagal memuat produk:", error);
-        }
-    }
-
-    // 2. RENDER PRODUK KE HALAMAN
-    function renderProducts(data) {
-        const container = document.getElementById('products');
-        if (data.length === 0) {
-            container.innerHTML = `<div class="col-span-full text-center py-20"><p class="text-slate-400 text-lg italic">Menu tidak ditemukan... 😅</p></div>`;
-            return;
         }
 
-        container.innerHTML = data.map(p => `
-            <div class="product-card bg-white border border-slate-100 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col group">
-                <div class="overflow-hidden rounded-2xl mb-4 h-52 relative">
-                    <img src="${p.imageUrl}" class="w-full h-full object-cover transition-transform duration-500">
-                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur shadow-sm px-2 py-1 rounded-lg text-[10px] font-bold text-[#6F4E37] uppercase">
-                        Stok: ${p.stock}
+        function renderProducts(products) {
+            const container = document.getElementById('productList');
+            container.innerHTML = products.map(p => {
+                const isOutOfStock = p.stock <= 0;
+                return `
+                <div class="product-card bg-white rounded-3xl overflow-hidden shadow-sm border border-orange-50 transition-all">
+                    <div class="relative overflow-hidden h-40 md:h-48">
+                        <img src="${p.imageUrl}" class="w-full h-full object-cover transition-transform duration-500" 
+                             style="${isOutOfStock ? 'filter: grayscale(1); opacity: 0.5;' : ''}">
+                        ${isOutOfStock ? `
+                            <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                <span class="bg-white/90 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-xl">Habis</span>
+                            </div>
+                        ` : ''}
                     </div>
-                </div>
-                <h3 class="font-bold text-lg text-slate-900 mb-1 line-clamp-1">${p.name}</h3>
-                <p class="text-sm text-slate-500 mb-5 line-clamp-2 h-10">${p.description || ''}</p>
-                <div class="flex justify-between items-center mt-auto">
-                    <div class="flex flex-col">
-                        <span class="text-xs text-slate-400">Harga</span>
-                        <span class="text-[#6F4E37] font-extrabold text-lg">Rp${Number(p.price).toLocaleString()}</span>
+                    <div class="p-4">
+                        <h3 class="font-bold text-[#3E2723] text-sm md:text-base line-clamp-1">${p.name}</h3>
+                        <p class="text-[10px] text-slate-400 mb-2">Stok: ${p.stock}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-extrabold text-[#6F4E37]">Rp${Number(p.price).toLocaleString()}</span>
+                            ${isOutOfStock ? 
+                                `<button disabled class="bg-slate-100 text-slate-400 px-3 py-2 rounded-xl text-[10px] font-bold">Habis</button>` : 
+                                `<button onclick="addToCart(${p.id})" class="bg-[#6F4E37] text-white w-8 h-8 rounded-xl hover:bg-[#3E2723] transition-all">+</button>`
+                            }
+                        </div>
                     </div>
-                    <button onclick="addToCart(${p.id})" class="bg-slate-900 hover:bg-[#6F4E37] text-white p-3 rounded-xl transition-colors shadow-md active:scale-90">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // 3. LOGIKA KERANJANG
-    function addToCart(productId) {
-        const product = allProducts.find(p => p.id === productId);
-        const existing = cart.find(c => c.productId === productId);
-        
-        if (existing) {
-            existing.quantity++;
-        } else {
-            cart.push({ productId, quantity: 1, name: product.name, price: product.price, imageUrl: product.imageUrl });
-        }
-        updateCartUI();
-    }
-
-    function updateCartUI() {
-        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-        document.getElementById('count').innerText = count;
-        document.getElementById('count-mobile').innerText = count;
-    }
-
-    function toggleCart() {
-        const m = document.getElementById('cartModal');
-        if (m.classList.contains('hidden')) {
-            m.classList.remove('hidden');
-            renderCartList();
-        } else {
-            m.classList.add('hidden');
-        }
-    }
-
-    function renderCartList() {
-        const container = document.getElementById('cartList');
-        if (cart.length === 0) {
-            container.innerHTML = `<p class="text-center text-slate-400 italic py-10 text-sm">Keranjangmu masih kosong...</p>`;
-            return;
+                </div>`;
+            }).join('');
         }
 
-        container.innerHTML = cart.map(c => `
-            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <img src="${c.imageUrl}" class="w-16 h-16 rounded-xl object-cover">
-                <div class="flex-grow">
-                    <h4 class="font-bold text-sm text-slate-900">${c.name}</h4>
-                    <p class="text-xs text-slate-500">x${c.quantity}</p>
-                </div>
-                <div class="text-right font-bold text-[#6F4E37] text-sm">
-                    Rp${(c.price * c.quantity).toLocaleString()}
-                </div>
-            </div>
-        `).join('');
-    }
+        function addToCart(id) {
+            const p = allProducts.find(x => x.id === id);
+            const inCart = cart.find(x => x.id === id);
+            if (inCart) {
+                if(inCart.qty < p.stock) inCart.qty++;
+                else alert("Maaf, stok sudah habis!");
+            } else {
+                cart.push({...p, qty: 1});
+            }
+            updateCartUI();
+        }
 
-    // 4. FITUR CHECKOUT & WHATSAPP (PERBAIKAN ERROR)
-    async function checkout() {
-        // Ambil ID yang benar dari HTML: cName dan cAddr
-        const customerName = document.getElementById('cName').value;
-        const address = document.getElementById('cAddr').value;
-        const phoneAdmin = "6285752214806"; 
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.reduce((a, b) => a + b.qty, 0);
+            const container = document.getElementById('cartItems');
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.qty;
+                return `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-2xl">
+                    <div>
+                        <p class="font-bold text-sm">${item.name}</p>
+                        <p class="text-xs text-[#6F4E37]">Rp${(item.price * item.qty).toLocaleString()}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 border rounded-lg text-slate-400 text-xs">-</button>
+                        <span class="font-bold text-sm">${item.qty}</span>
+                        <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 border rounded-lg text-slate-400 text-xs">+</button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('cartTotal').innerText = `Rp${total.toLocaleString()}`;
+        }
 
-        if (!customerName || !address) return alert("Mohon isi Nama dan Alamat!");
-        if (cart.length === 0) return alert("Keranjang belanja kosong!");
+        function changeQty(id, delta) {
+            const item = cart.find(x => x.id === id);
+            const p = allProducts.find(x => x.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty > p.stock) {
+                    item.qty = p.stock;
+                    alert("Stok terbatas!");
+                }
+                if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+            }
+            updateCartUI();
+        }
 
-        try {
+        function toggleCart() { document.getElementById('cartModal').classList.toggle('hidden'); }
+
+        async function checkout() {
+            const name = document.getElementById('custName').value;
+            const address = document.getElementById('custAddress').value;
+            if(!name || !address || cart.length === 0) return alert("Mohon lengkapi data!");
+
             const res = await fetch('/api/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    customerName,
-                    address,
-                    items: cart.map(item => ({ productId: item.productId, quantity: item.quantity }))
+                    customerName: name, address,
+                    items: cart.map(i => ({ productId: i.id, quantity: i.qty }))
                 })
             });
 
             const data = await res.json();
+            if(data.success) {
+                let total = 0;
+                let detailPesanan = cart.map(i => {
+                    total += i.price * i.qty;
+                    return `- *${i.name}* (x${i.qty})`;
+                }).join('%0A');
 
-            if (data.success) {
-                // Rangkai teks WA
-                let detailPesanan = "";
-                let totalHarga = 0;
-                cart.forEach((item, index) => {
-                    detailPesanan += `${index + 1}. ${item.name} (x${item.quantity})\n`;
-                    totalHarga += item.price * item.quantity;
-                });
-
-                const pesanWA = `*PESANAN BARU - PESANAJA*\n\n` +
-                    `*Nama:* ${customerName}\n` +
-                    `*Alamat:* ${address}\n\n` +
-                    `*Detail Pesanan:*\n${detailPesanan}\n` +
-                    `*Total Bayar:* Rp${totalHarga.toLocaleString()}\n\n` +
-                    `Mohon diproses ya Min, Terima kasih!`;
-
-                const urlWA = `https://wa.me/${phoneAdmin}?text=${encodeURIComponent(pesanWA)}`;
+                const text = `Halo Admin PesanAja!%0A%0A*ADA PESANAN BARU*%0A------------------%0A👤 *Nama:* ${name}%0A📍 *Meja/Alamat:* ${address}%0A%0A*MENU YG DIPESAN:*%0A${detailPesanan}%0A------------------%0A💰 *TOTAL BAYAR: Rp${total.toLocaleString()}*%0A%0AMohon segera diproses, terima kasih!`;
                 
-                window.open(urlWA, '_blank'); // Buka WA
-
-                alert("Pesanan berhasil! Mengalihkan ke WhatsApp...");
-                cart = [];
-                updateCartUI();
-                toggleCart(); // Tutup modal
+                window.open(`https://wa.me/${WA_NUMBER}?text=${text}`);
+                location.reload();
             } else {
                 alert("Gagal: " + data.message);
             }
-        } catch (e) {
-            alert("Terjadi kesalahan koneksi.");
         }
-    }
 
-    // 5. SEARCH & FILTER
-    function applyFilters() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = allProducts.filter(p => {
-            const matchSearch = p.name.toLowerCase().includes(query) || (p.description && p.description.toLowerCase().includes(query));
-            const matchCategory = currentCategory === 'all' || p.categoryId.toString() === currentCategory;
-            return matchSearch && matchCategory;
-        });
-        renderProducts(filtered);
-    }
+        function searchProducts() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(q)));
+        }
 
-    function searchProducts() { applyFilters(); }
-
-    function filterCategory(catId) {
-        currentCategory = catId;
-        const btns = document.querySelectorAll('.category-btn');
-        btns.forEach(btn => btn.classList.remove('bg-indigo-600', 'text-white'));
-        event.currentTarget.classList.add('bg-indigo-600', 'text-white');
-        applyFilters();
-    }
-
-    load();
-</script>
+        load();
+    </script>
 </body>
-
 </html>
