@@ -1,4 +1,3 @@
-// src/index.js
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
@@ -30,30 +29,32 @@ const authMiddleware = async (c, next) => {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         c.set('user', payload);
         await next();
-    } catch (e) {
-        return c.json({ message: 'Invalid Token' }, 403);
-    }
+    } catch (e) { return c.json({ message: 'Invalid Token' }, 403); }
 };
 
 // API LOGIN
 app.post('/api/login', async (c) => {
     const { username, password } = await c.req.json();
     const user = await db.query.users.findFirst({ where: eq(schema.users.username, username) });
-    if (!user || !bcrypt.compareSync(password, user.password)) {
-        return c.json({ success: false, message: 'Login Gagal' }, 401);
-    }
+    if (!user || !bcrypt.compareSync(password, user.password)) return c.json({ success: false, message: 'Gagal' }, 401);
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
     return c.json({ success: true, token });
 });
 
-// API CREATE PRODUK
+// GET SEMUA PRODUK
+app.get('/api/products', async (c) => {
+    const data = await db.select().from(schema.products).orderBy(desc(schema.products.id));
+    return c.json({ success: true, data });
+});
+
+// CREATE PRODUK
 app.post('/api/products', authMiddleware, async (c) => {
     try {
         const body = await c.req.parseBody();
         const imageFile = body['image'];
         if (!imageFile || !(imageFile instanceof File)) return c.json({ success: false, message: 'Gambar wajib!' }, 400);
 
-        const fileName = `prod_${Date.now()}_${imageFile.name.replace(/\s/g, '_')}`;
+        const fileName = `prod_${Date.now()}_${imageFile.name}`;
         const arrayBuffer = await imageFile.arrayBuffer();
         await supabase.storage.from('products').upload(fileName, arrayBuffer, { contentType: imageFile.type });
         const { data } = supabase.storage.from('products').getPublicUrl(fileName);
@@ -66,11 +67,11 @@ app.post('/api/products', authMiddleware, async (c) => {
             categoryId: parseInt(body['categoryId']),
             imageUrl: data.publicUrl
         });
-        return c.json({ success: true, message: 'Produk Tersimpan' });
+        return c.json({ success: true });
     } catch (e) { return c.json({ success: false, message: e.message }, 500); }
 });
 
-// API UPDATE PRODUK (BARU)
+// UPDATE PRODUK (LOGIKA FINAL)
 app.put('/api/products/:id', authMiddleware, async (c) => {
     const id = parseInt(c.req.param('id'));
     try {
@@ -84,61 +85,39 @@ app.put('/api/products/:id', authMiddleware, async (c) => {
         };
 
         const imageFile = body['image'];
-        if (imageFile && imageFile instanceof File) {
-            const fileName = `prod_${Date.now()}_${imageFile.name.replace(/\s/g, '_')}`;
+        
+        // Cek apakah ada file baru (bukan string nama file lama)
+        if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+            const fileName = `upd_${Date.now()}_${imageFile.name.replace(/\s/g, '_')}`;
             const arrayBuffer = await imageFile.arrayBuffer();
-            await supabase.storage.from('products').upload(fileName, arrayBuffer, { contentType: imageFile.type });
+            
+            const { error: uploadError } = await supabase.storage
+                .from('products')
+                .upload(fileName, arrayBuffer, { contentType: imageFile.type });
+
+            if (uploadError) throw uploadError;
+
             const { data } = supabase.storage.from('products').getPublicUrl(fileName);
             updateData.imageUrl = data.publicUrl;
         }
 
         await db.update(schema.products).set(updateData).where(eq(schema.products.id, id));
-        return c.json({ success: true, message: 'Produk Terupdate' });
+        return c.json({ success: true });
     } catch (e) { return c.json({ success: false, message: e.message }, 500); }
 });
 
-// API DELETE PRODUK (PERBAIKAN ERROR CONSTRAINT)
+// DELETE PRODUK
 app.delete('/api/products/:id', authMiddleware, async (c) => {
     const id = parseInt(c.req.param('id'));
     try {
         const product = await db.query.products.findFirst({ where: eq(schema.products.id, id) });
-        if (!product) return c.json({ success: false, message: 'Produk tidak ditemukan' }, 404);
-
-        // Hapus riwayat di order_items dulu agar tidak error constraint
+        if (!product) return c.json({ success: false });
         await db.delete(schema.orderItems).where(eq(schema.orderItems.productId, id));
-
         const fileName = product.imageUrl.split('/').pop();
         await supabase.storage.from('products').remove([fileName]);
-
         await db.delete(schema.products).where(eq(schema.products.id, id));
-        return c.json({ success: true, message: 'Terhapus' });
+        return c.json({ success: true });
     } catch (e) { return c.json({ success: false, message: e.message }, 500); }
-});
-
-app.get('/api/products', async (c) => {
-    const data = await db.select().from(schema.products).orderBy(desc(schema.products.id));
-    return c.json({ success: true, data });
-});
-
-// API ORDER & CHECKOUT
-app.post('/api/orders', async (c) => {
-    const { customerName, address, items } = await c.req.json();
-    try {
-        const result = await db.transaction(async (tx) => {
-            let total = 0;
-            const [newOrder] = await tx.insert(schema.orders).values({ customerName, address, totalAmount: "0", status: 'pending' }).returning();
-            for (const item of items) {
-                const product = await tx.query.products.findFirst({ where: eq(schema.products.id, item.productId) });
-                if (!product || product.stock < item.quantity) throw new Error(`Stok ${product?.name} kurang!`);
-                total += (parseFloat(product.price) * item.quantity);
-                await tx.insert(schema.orderItems).values({ orderId: newOrder.id, productId: item.productId, quantity: item.quantity, priceAtTime: product.price });
-                await tx.update(schema.products).set({ stock: product.stock - item.quantity }).where(eq(schema.products.id, item.productId));
-            }
-            await tx.update(schema.orders).set({ totalAmount: total.toString() }).where(eq(schema.orders.id, newOrder.id));
-            return { orderId: newOrder.id, total };
-        });
-        return c.json({ success: true, ...result });
-    } catch (e) { return c.json({ success: false, message: e.message }, 400); }
 });
 
 const port = 2112;

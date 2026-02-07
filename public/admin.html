@@ -156,44 +156,31 @@
         </div>
     </main>
 
-  <script>
+ <script>
     const token = localStorage.getItem('token');
     if (!token) window.location.href = '/login.html';
 
     let editId = null;
     let allProducts = [];
 
-    function logout() {
-        localStorage.removeItem('token');
-        window.location.href = '/login.html';
-    }
-
     async function fetchAdminProducts() {
-        try {
-            const res = await fetch('/api/products');
-            const json = await res.json();
-            allProducts = json.data;
-            const container = document.getElementById('productList');
-            document.getElementById('productCount').innerText = `${allProducts.length} Produk`;
-
-            container.innerHTML = allProducts.map(p => `
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 flex gap-4 items-center shadow-sm">
-                    <img src="${p.imageUrl}" class="w-16 h-16 rounded-xl object-cover bg-slate-50">
-                    <div class="flex-grow">
-                        <h3 class="font-bold text-xs">${p.name}</h3>
-                        <p class="text-[#6F4E37] font-bold text-[10px]">Rp${Number(p.price).toLocaleString()}</p>
-                    </div>
-                    <div class="flex gap-1">
-                        <button onclick="prepareEdit(${p.id})" class="p-2 text-amber-500 hover:bg-amber-50 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                        </button>
-                        <button onclick="deleteProduct(${p.id})" class="p-2 text-red-400 hover:bg-red-50 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    </div>
+        const res = await fetch('/api/products');
+        const json = await res.json();
+        allProducts = json.data;
+        const container = document.getElementById('productList');
+        container.innerHTML = allProducts.map(p => `
+            <div class="bg-white p-4 rounded-2xl flex gap-4 items-center shadow-sm mb-3">
+                <img src="${p.imageUrl}" class="w-16 h-16 rounded-xl object-cover">
+                <div class="flex-grow">
+                    <h3 class="font-bold text-sm">${p.name}</h3>
+                    <p class="text-amber-700 font-bold text-xs">Rp${Number(p.price).toLocaleString()}</p>
                 </div>
-            `).join('');
-        } catch (e) { console.error(e); }
+                <div class="flex gap-2">
+                    <button onclick="prepareEdit(${p.id})" class="p-2 text-amber-500">✎</button>
+                    <button onclick="deleteProduct(${p.id})" class="p-2 text-red-500">🗑</button>
+                </div>
+            </div>
+        `).join('');
     }
 
     function prepareEdit(id) {
@@ -204,10 +191,10 @@
         document.getElementById('price').value = p.price;
         document.getElementById('stock').value = p.stock;
         document.getElementById('category').value = p.categoryId;
-        document.querySelector('#productForm h2').innerText = '✎ Edit Produk';
-        document.querySelector('#productForm button').innerText = 'Update Produk';
-        document.getElementById('image').required = false;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        document.querySelector('button[type="submit"]').innerText = 'Update Produk';
+        document.getElementById('image').required = false; 
+        window.scrollTo(0, 0);
     }
 
     document.getElementById('productForm').addEventListener('submit', async (e) => {
@@ -221,7 +208,11 @@
         formData.append('price', document.getElementById('price').value);
         formData.append('stock', document.getElementById('stock').value);
         formData.append('categoryId', document.getElementById('category').value);
-        if (document.getElementById('image').files[0]) formData.append('image', document.getElementById('image').files[0]);
+        
+        const fileInput = document.getElementById('image');
+        if (fileInput.files[0]) {
+            formData.append('image', fileInput.files[0]);
+        }
 
         const url = editId ? `/api/products/${editId}` : '/api/products';
         const method = editId ? 'PUT' : 'POST';
@@ -234,27 +225,21 @@
 
         const data = await res.json();
         if (data.success) {
-            alert(editId ? 'Diperbarui!' : 'Ditambahkan!');
+            alert('Berhasil!');
             location.reload();
         } else {
-            alert('Error: ' + data.message);
+            alert('Gagal: ' + data.message);
             btn.disabled = false;
         }
     });
 
     async function deleteProduct(id) {
-        if (!confirm('Hapus produk ini? Riwayat pesanan terkait juga akan terhapus.')) return;
+        if (!confirm('Hapus produk ini?')) return;
         const res = await fetch(`/api/products/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + token }
         });
-        const data = await res.json();
-        if (data.success) {
-            alert('Terhapus!');
-            fetchAdminProducts();
-        } else {
-            alert('Gagal: ' + data.message);
-        }
+        if ((await res.json()).success) fetchAdminProducts();
     }
 
     fetchAdminProducts();
