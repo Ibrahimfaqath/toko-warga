@@ -1,274 +1,148 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - PesanAja</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #FDF8F5; /* Cream Background */
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-    </style>
+    <style>body { background-color: #F8FAFC; font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
-
-<body class="pb-20">
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-orange-100 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-[#6F4E37] rounded-lg flex items-center justify-center text-white font-bold">P</div>
-                <h1 class="text-xl font-extrabold text-[#3E2723] tracking-tight">PesanAja <span class="text-[#6F4E37]">Admin</span></h1>
+<body class="p-4 md:p-10">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black text-[#3E2723]">Admin <span class="text-[#6F4E37]">Control</span></h1>
+                <p class="text-slate-400 text-sm">Kelola menu dan pesanan tokomu</p>
             </div>
-            <button onclick="logout()" class="text-sm font-bold text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all">Keluar</button>
-        </div>
-    </nav>
+            <button onclick="localStorage.clear(); location.reload();" class="bg-red-50 text-red-500 px-6 py-2 rounded-xl font-bold text-xs hover:bg-red-500 hover:text-white transition-all">Logout</button>
+        </header>
 
-    <main class="max-w-7xl mx-auto px-4 pt-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div class="lg:col-span-1">
-                <div class="glass-card p-6 rounded-3xl sticky top-24 shadow-xl shadow-orange-900/5">
-                    <h2 class="text-xl font-bold text-[#3E2723] mb-6 flex items-center gap-2">
-                        <span class="w-2 h-6 bg-[#6F4E37] rounded-full"></span>
-                        Kelola Produk
-                    </h2>
-                    <form id="productForm" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Nama Produk</label>
-                            <input type="text" id="name" required class="w-full p-3 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-[#6F4E37] outline-none bg-slate-50/50">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Deskripsi</label>
-                            <textarea id="description" rows="2" class="w-full p-3 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-[#6F4E37] outline-none bg-slate-50/50"></textarea>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Harga (Rp)</label>
-                                <input type="number" id="price" required class="w-full p-3 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-[#6F4E37] outline-none bg-slate-50/50">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Stok</label>
-                                <input type="number" id="stock" required class="w-full p-3 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-[#6F4E37] outline-none bg-slate-50/50">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Kategori</label>
-                            <select id="category" class="w-full p-3 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-[#6F4E37] outline-none bg-slate-50/50">
-                                <option value="1">☕ Coffee & Latte</option>
-                                <option value="2">🍵 Non-Coffee</option>
-                                <option value="3">🥐 Pastry & Bakery</option>
-                                <option value="4">🍟 Snacks</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Foto Produk</label>
-                            <input type="file" id="image" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#6F4E37] file:text-white hover:file:bg-[#5D4037]">
-                        </div>
-                        <button type="submit" class="w-full bg-[#6F4E37] hover:bg-[#3E2723] text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-orange-900/20 active:scale-95 mt-4">
-                            Simpan ke Database
-                        </button>
-                    </form>
+        <div class="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100 mb-10">
+            <h2 id="formTitle" class="text-lg font-bold mb-6 flex items-center gap-2">
+                <span class="w-2 h-6 bg-[#6F4E37] rounded-full"></span> Tambah / Edit Menu
+            </h2>
+            <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <input type="hidden" id="editId">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nama Menu</label>
+                    <input type="text" name="name" id="name" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required>
                 </div>
-            </div>
-
-            <div class="lg:col-span-2">
-                <h2 class="text-xl font-bold text-[#3E2723] mb-6 flex items-center gap-2">
-                    <span class="w-2 h-6 bg-[#6F4E37] rounded-full"></span>
-                    Menu Saat Ini
-                </h2>
-                <div id="productList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    </div>
-            </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Harga (Angka)</label>
+                    <input type="number" name="price" id="price" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Stok Awal</label>
+                    <input type="number" name="stock" id="stock" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kategori</label>
+                    <select name="categoryId" id="catId" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required></select>
+                </div>
+                <div class="md:col-span-2 space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Deskripsi Singkat</label>
+                    <textarea name="description" id="desc" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Foto Menu</label>
+                    <input type="file" name="image" id="image" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#6F4E37] file:text-white hover:file:bg-[#3E2723]">
+                </div>
+                <div class="md:col-span-2 flex gap-3 mt-2">
+                    <button type="submit" class="flex-grow bg-[#6F4E37] text-white py-4 rounded-2xl font-bold shadow-lg shadow-[#6F4E37]/20 active:scale-95 transition-all">Simpan Perubahan</button>
+                    <button type="button" onclick="resetForm()" class="px-8 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200 transition-all">Batal</button>
+                </div>
+            </form>
         </div>
 
-        <section class="mt-16">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h2 class="text-2xl font-extrabold text-[#3E2723]">Pesanan Masuk</h2>
-                    <p class="text-slate-500 text-sm italic">Kelola transaksi dan status pengiriman pelanggan</p>
-                </div>
-                <button onclick="fetchOrders()" class="p-3 bg-white border border-orange-100 rounded-2xl hover:bg-orange-50 transition-all shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6F4E37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
+        <div class="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden mb-10">
+            <h3 class="p-6 font-bold border-b text-slate-700">Manajemen Stok & Harga</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] font-bold">
+                        <tr>
+                            <th class="p-6">Produk</th>
+                            <th class="p-6">Harga</th>
+                            <th class="p-6">Stok</th>
+                            <th class="p-6">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTable" class="divide-y divide-slate-50"></tbody>
+                </table>
             </div>
-            <div id="orderList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <script>
         const token = localStorage.getItem('token');
-        if (!token) window.location.href = '/login.html';
+        if(!token) window.location.href = 'login.html';
+        let allProds = [];
 
-        let editId = null;
-        let allProducts = [];
-
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = '/login.html';
-        }
-
-        // --- PRODUK LOGIC ---
-        async function fetchAdminProducts() {
+        async function init() {
             const res = await fetch('/api/products');
             const json = await res.json();
-            allProducts = json.data;
-            const container = document.getElementById('productList');
-            container.innerHTML = allProducts.map(p => `
-                <div class="bg-white p-4 rounded-3xl flex gap-4 items-center shadow-sm border border-orange-50">
-                    <img src="${p.imageUrl}" class="w-20 h-20 rounded-2xl object-cover shadow-sm">
-                    <div class="flex-grow">
-                        <h3 class="font-bold text-[#3E2723] text-sm">${p.name}</h3>
-                        <p class="text-[#6F4E37] font-bold text-xs">Rp${Number(p.price).toLocaleString()}</p>
-                        <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-tighter text-warm">Stok: ${p.stock}</p>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <button onclick="prepareEdit(${p.id})" class="p-2 text-amber-500 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors">✎</button>
-                        <button onclick="deleteProduct(${p.id})" class="p-2 text-red-500 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">🗑</button>
-                    </div>
-                </div>
+            allProds = json.data;
+            document.getElementById('catId').innerHTML = json.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            renderTable();
+        }
+
+        function renderTable() {
+            document.getElementById('productTable').innerHTML = allProds.map(p => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-6 flex items-center gap-4">
+                        <img src="${p.imageUrl}" class="w-12 h-12 object-cover rounded-2xl border border-slate-100">
+                        <span class="font-bold text-slate-700">${p.name}</span>
+                    </td>
+                    <td class="p-6 font-medium text-slate-600">Rp${Number(p.price).toLocaleString()}</td>
+                    <td class="p-6">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold ${p.stock < 10 ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'}">
+                            ${p.stock} Tersedia
+                        </span>
+                    </td>
+                    <td class="p-6">
+                        <button onclick="edit(${p.id})" class="text-blue-500 font-bold hover:underline mr-4">Edit</button>
+                        <button onclick="del(${p.id})" class="text-red-400 font-bold hover:underline">Hapus</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        function prepareEdit(id) {
-            editId = id;
-            const p = allProducts.find(x => x.id === id);
+        document.getElementById('productForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const res = await fetch(id ? `/api/products/${id}` : '/api/products', {
+                method: id ? 'PUT' : 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: new FormData(e.target)
+            });
+            if((await res.json()).success) { init(); resetForm(); }
+        };
+
+        function edit(id) {
+            const p = allProds.find(x => x.id === id);
+            document.getElementById('editId').value = p.id;
             document.getElementById('name').value = p.name;
-            document.getElementById('description').value = p.description;
             document.getElementById('price').value = p.price;
             document.getElementById('stock').value = p.stock;
-            document.getElementById('category').value = p.categoryId;
-            document.querySelector('button[type="submit"]').innerText = 'Update Produk Sekarang';
-            document.getElementById('image').required = false; 
+            document.getElementById('catId').value = p.categoryId;
+            document.getElementById('desc').value = p.description || '';
+            document.getElementById('formTitle').innerHTML = `<span class="w-2 h-6 bg-blue-500 rounded-full"></span> Edit Menu: ${p.name}`;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        document.getElementById('productForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            btn.disabled = true;
-
-            const formData = new FormData();
-            formData.append('name', document.getElementById('name').value);
-            formData.append('description', document.getElementById('description').value);
-            formData.append('price', document.getElementById('price').value);
-            formData.append('stock', document.getElementById('stock').value);
-            formData.append('categoryId', document.getElementById('category').value);
-            
-            const fileInput = document.getElementById('image');
-            if (fileInput.files[0]) {
-                formData.append('image', fileInput.files[0]);
-            }
-
-            const url = editId ? `/api/products/${editId}` : '/api/products';
-            const method = editId ? 'PUT' : 'POST';
-
-            const res = await fetch(url, {
-                method: method,
-                headers: { 'Authorization': 'Bearer ' + token },
-                body: formData
-            });
-
-            const data = await res.json();
-            if (data.success) {
-                alert('Berhasil menyimpan data!');
-                location.reload();
-            } else {
-                alert('Gagal: ' + data.message);
-                btn.disabled = false;
-            }
-        });
-
-        async function deleteProduct(id) {
-            if (!confirm('Yakin ingin menghapus menu ini?')) return;
-            const res = await fetch(`/api/products/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            if ((await res.json()).success) fetchAdminProducts();
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('editId').value = "";
+            document.getElementById('formTitle').innerHTML = `<span class="w-2 h-6 bg-[#6F4E37] rounded-full"></span> Tambah Menu Baru`;
         }
 
-        // --- ORDER LOGIC ---
-        async function fetchOrders() {
-            const container = document.getElementById('orderList');
-            try {
-                const res = await fetch('/api/admin/orders', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const json = await res.json();
-
-                if (json.data.length === 0) {
-                    container.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 italic">Belum ada pesanan masuk.</div>`;
-                    return;
-                }
-
-                container.innerHTML = json.data.map(order => {
-                    const isPending = order.status === 'pending';
-                    return `
-                    <div class="bg-white rounded-3xl shadow-sm border border-orange-50 overflow-hidden flex flex-col transition-all hover:shadow-md">
-                        <div class="p-4 bg-slate-50/50 border-b border-orange-50 flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order #${order.id}</span>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase ${isPending ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}">
-                                ${order.status}
-                            </span>
-                        </div>
-                        <div class="p-5 flex-grow">
-                            <h4 class="font-bold text-[#3E2723]">${order.customerName}</h4>
-                            <p class="text-[11px] text-slate-500 mb-4 line-clamp-1 italic">📍 ${order.address}</p>
-                            
-                            <div class="space-y-2 p-3 bg-[#FDF8F5] rounded-2xl mb-4">
-                                ${order.items.map(item => `
-                                    <div class="flex justify-between text-xs">
-                                        <span class="text-slate-600">${item.product.name} <span class="text-slate-400 text-[10px]">x${item.quantity}</span></span>
-                                        <span class="font-bold text-[#3E2723]">Rp${(item.priceAtTime * item.quantity).toLocaleString()}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            
-                            <div class="flex justify-between items-end">
-                                <div>
-                                    <p class="text-[10px] text-slate-400 uppercase font-bold">Total Harga</p>
-                                    <p class="text-lg font-extrabold text-[#6F4E37]">Rp${Number(order.totalAmount).toLocaleString()}</p>
-                                </div>
-                                ${isPending ? `
-                                    <button onclick="updateStatus(${order.id}, 'paid')" class="bg-[#3E2723] hover:bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-95">Selesaikan</button>
-                                ` : `
-                                    <span class="text-green-500 font-bold text-xs flex items-center gap-1">✓ Selesai</span>
-                                `}
-                            </div>
-                        </div>
-                    </div>`;
-                }).join('');
-            } catch (e) { console.error("Gagal load orders"); }
+        async function del(id) {
+            if(!confirm('Hapus menu ini secara permanen?')) return;
+            await fetch(`/api/products/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+            init();
         }
 
-        async function updateStatus(id, newStatus) {
-            const res = await fetch(`/api/orders/${id}/status`, {
-                method: 'PATCH',
-                headers: { 
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify({ status: newStatus })
-            });
-            const data = await res.json();
-            if (data.success) fetchOrders();
-        }
-
-        // LOAD SEMUA DATA SAAT BUKA HALAMAN
-        fetchAdminProducts();
-        fetchOrders();
+        init();
     </script>
 </body>
-
 </html>
