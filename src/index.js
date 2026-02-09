@@ -39,7 +39,7 @@ app.post('/api/login', async (c) => {
     return c.json({ success: true, token });
 });
 
-// GET PRODUCTS & CATEGORIES
+// GET PRODUCTS
 app.get('/api/products', async (c) => {
     const products = await db.select().from(schema.products).orderBy(desc(schema.products.id));
     const categories = await db.select().from(schema.categories);
@@ -51,9 +51,13 @@ app.post('/api/products', authMiddleware, async (c) => {
     try {
         const body = await c.req.parseBody();
         const imageFile = body['image'];
-        const fileName = `prod_${Date.now()}_${imageFile.name}`;
-        await supabase.storage.from('products').upload(fileName, await imageFile.arrayBuffer(), { contentType: imageFile.type });
-        const { data } = supabase.storage.from('products').getPublicUrl(fileName);
+        
+        let imageUrl = '';
+        if (imageFile && imageFile.size > 0) {
+            const fileName = `prod_${Date.now()}_${imageFile.name}`;
+            await supabase.storage.from('products').upload(fileName, await imageFile.arrayBuffer(), { contentType: imageFile.type });
+            imageUrl = supabase.storage.from('products').getPublicUrl(fileName).data.publicUrl;
+        }
 
         await db.insert(schema.products).values({
             name: body['name'],
@@ -61,13 +65,13 @@ app.post('/api/products', authMiddleware, async (c) => {
             price: body['price'],
             stock: parseInt(body['stock']),
             categoryId: parseInt(body['categoryId']),
-            imageUrl: data.publicUrl
+            imageUrl: imageUrl
         });
         return c.json({ success: true });
     } catch (e) { return c.json({ success: false, message: e.message }, 500); }
 });
 
-// UPDATE PRODUCT
+// UPDATE PRODUCT (DIREVISI)
 app.put('/api/products/:id', authMiddleware, async (c) => {
     const id = parseInt(c.req.param('id'));
     try {
@@ -79,14 +83,21 @@ app.put('/api/products/:id', authMiddleware, async (c) => {
             stock: parseInt(body['stock']),
             categoryId: parseInt(body['categoryId'])
         };
-        if (body['image'] && body['image'].size > 0) {
-            const fileName = `upd_${Date.now()}_${body['image'].name}`;
-            await supabase.storage.from('products').upload(fileName, await body['image'].arrayBuffer(), { contentType: body['image'].type });
+
+        const imageFile = body['image'];
+        // Cek jika ada file gambar baru yang diupload
+        if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+            const fileName = `upd_${Date.now()}_${imageFile.name}`;
+            await supabase.storage.from('products').upload(fileName, await imageFile.arrayBuffer(), { contentType: imageFile.type });
             updateData.imageUrl = supabase.storage.from('products').getPublicUrl(fileName).data.publicUrl;
         }
+
         await db.update(schema.products).set(updateData).where(eq(schema.products.id, id));
         return c.json({ success: true });
-    } catch (e) { return c.json({ success: false, message: e.message }, 500); }
+    } catch (e) { 
+        console.error(e);
+        return c.json({ success: false, message: e.message }, 500); 
+    }
 });
 
 // DELETE PRODUCT
@@ -97,12 +108,7 @@ app.delete('/api/products/:id', authMiddleware, async (c) => {
     return c.json({ success: true });
 });
 
-// ORDERS
-app.get('/api/admin/orders', authMiddleware, async (c) => {
-    const data = await db.query.orders.findMany({ with: { items: { with: { product: true } } }, orderBy: desc(schema.orders.id) });
-    return c.json({ success: true, data });
-});
-
+// API ORDERS
 app.post('/api/orders', async (c) => {
     const { customerName, address, items } = await c.req.json();
     const result = await db.transaction(async (tx) => {
@@ -117,20 +123,6 @@ app.post('/api/orders', async (c) => {
         return newOrder.id;
     });
     return c.json({ success: true, orderId: result });
-});
-
-app.patch('/api/orders/:id/status', authMiddleware, async (c) => {
-    const id = parseInt(c.req.param('id'));
-    const { status } = await c.req.json();
-    await db.update(schema.orders).set({ status }).where(eq(schema.orders.id, id));
-    return c.json({ success: true });
-});
-
-app.delete('/api/orders/:id', authMiddleware, async (c) => {
-    const id = parseInt(c.req.param('id'));
-    await db.delete(schema.orderItems).where(eq(schema.orderItems.orderId, id));
-    await db.delete(schema.orders).where(eq(schema.orders.id, id));
-    return c.json({ success: true });
 });
 
 serve({ fetch: app.fetch, port: 2112 });

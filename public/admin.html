@@ -29,47 +29,44 @@
                     <input type="text" name="name" id="name" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required>
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Harga (Angka)</label>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Harga</label>
                     <input type="number" name="price" id="price" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required>
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Stok Awal</label>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Stok</label>
                     <input type="number" name="stock" id="stock" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required>
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kategori</label>
                     <select name="categoryId" id="catId" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]" required></select>
                 </div>
-                <div class="md:col-span-2 space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Deskripsi Singkat</label>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Deskripsi</label>
                     <textarea name="description" id="desc" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-[#6F4E37]"></textarea>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Foto Menu</label>
-                    <input type="file" name="image" id="image" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#6F4E37] file:text-white hover:file:bg-[#3E2723]">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Foto Menu (Biarkan kosong jika tidak diganti)</label>
+                    <input type="file" name="image" id="image" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#6F4E37] file:text-white">
                 </div>
                 <div class="md:col-span-2 flex gap-3 mt-2">
-                    <button type="submit" class="flex-grow bg-[#6F4E37] text-white py-4 rounded-2xl font-bold shadow-lg shadow-[#6F4E37]/20 active:scale-95 transition-all">Simpan Perubahan</button>
-                    <button type="button" onclick="resetForm()" class="px-8 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200 transition-all">Batal</button>
+                    <button type="submit" class="flex-grow bg-[#6F4E37] text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">Simpan Menu</button>
+                    <button type="button" onclick="resetForm()" class="px-8 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold">Batal</button>
                 </div>
             </form>
         </div>
 
-        <div class="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden mb-10">
-            <h3 class="p-6 font-bold border-b text-slate-700">Manajemen Stok & Harga</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] font-bold">
-                        <tr>
-                            <th class="p-6">Produk</th>
-                            <th class="p-6">Harga</th>
-                            <th class="p-6">Stok</th>
-                            <th class="p-6">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productTable" class="divide-y divide-slate-50"></tbody>
-                </table>
-            </div>
+        <div class="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="p-6">Produk</th>
+                        <th class="p-6">Harga</th>
+                        <th class="p-6">Stok</th>
+                        <th class="p-6">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="productTable" class="divide-y divide-slate-50"></tbody>
+            </table>
         </div>
     </div>
 
@@ -88,20 +85,16 @@
 
         function renderTable() {
             document.getElementById('productTable').innerHTML = allProds.map(p => `
-                <tr class="hover:bg-slate-50 transition-colors">
+                <tr class="hover:bg-slate-50">
                     <td class="p-6 flex items-center gap-4">
-                        <img src="${p.imageUrl}" class="w-12 h-12 object-cover rounded-2xl border border-slate-100">
-                        <span class="font-bold text-slate-700">${p.name}</span>
+                        <img src="${p.imageUrl}" class="w-12 h-12 object-cover rounded-xl">
+                        <span class="font-bold">${p.name}</span>
                     </td>
-                    <td class="p-6 font-medium text-slate-600">Rp${Number(p.price).toLocaleString()}</td>
+                    <td class="p-6">Rp${Number(p.price).toLocaleString()}</td>
+                    <td class="p-6">${p.stock}</td>
                     <td class="p-6">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-bold ${p.stock < 10 ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'}">
-                            ${p.stock} Tersedia
-                        </span>
-                    </td>
-                    <td class="p-6">
-                        <button onclick="edit(${p.id})" class="text-blue-500 font-bold hover:underline mr-4">Edit</button>
-                        <button onclick="del(${p.id})" class="text-red-400 font-bold hover:underline">Hapus</button>
+                        <button onclick="edit(${p.id})" class="text-blue-500 font-bold mr-4">Edit</button>
+                        <button onclick="del(${p.id})" class="text-red-400 font-bold">Hapus</button>
                     </td>
                 </tr>
             `).join('');
@@ -110,12 +103,30 @@
         document.getElementById('productForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const res = await fetch(id ? `/api/products/${id}` : '/api/products', {
-                method: id ? 'PUT' : 'POST',
-                headers: { 'Authorization': 'Bearer ' + token },
-                body: new FormData(e.target)
-            });
-            if((await res.json()).success) { init(); resetForm(); }
+            const formData = new FormData(e.target);
+            
+            const url = id ? `/api/products/${id}` : '/api/products';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: formData
+                });
+                
+                const result = await res.json();
+                if(result.success) {
+                    alert("Berhasil!");
+                    resetForm();
+                    init();
+                } else {
+                    alert("Gagal: " + result.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan sistem");
+            }
         };
 
         function edit(id) {
@@ -126,19 +137,22 @@
             document.getElementById('stock').value = p.stock;
             document.getElementById('catId').value = p.categoryId;
             document.getElementById('desc').value = p.description || '';
-            document.getElementById('formTitle').innerHTML = `<span class="w-2 h-6 bg-blue-500 rounded-full"></span> Edit Menu: ${p.name}`;
+            document.getElementById('formTitle').innerHTML = `Edit Menu: ${p.name}`;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetForm() {
             document.getElementById('productForm').reset();
             document.getElementById('editId').value = "";
-            document.getElementById('formTitle').innerHTML = `<span class="w-2 h-6 bg-[#6F4E37] rounded-full"></span> Tambah Menu Baru`;
+            document.getElementById('formTitle').innerText = "Tambah Menu Baru";
         }
 
         async function del(id) {
-            if(!confirm('Hapus menu ini secara permanen?')) return;
-            await fetch(`/api/products/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+            if(!confirm('Hapus menu ini?')) return;
+            await fetch(`/api/products/${id}`, { 
+                method: 'DELETE', 
+                headers: { 'Authorization': 'Bearer ' + token } 
+            });
             init();
         }
 
