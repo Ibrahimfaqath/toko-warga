@@ -10,7 +10,14 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 
-process.loadEnvFile();
+// Hanya load file .env jika aplikasi tidak berjalan di Vercel (Local development)
+if (!process.env.VERCEL) {
+    try {
+        process.loadEnvFile();
+    } catch (e) {
+        console.warn("File .env tidak ditemukan, menggunakan Environment Variables sistem.");
+    }
+}
 const client = postgres(process.env.DATABASE_URL);
 const db = drizzle(client, { schema });
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
